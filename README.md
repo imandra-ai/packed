@@ -1,2 +1,3 @@
-# packed-error
-Utility library that makes public and private error implementations easy
+# packed
+
+Utilities for preventing dependency leaking and enabling mocks in OCaml
