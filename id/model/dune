@@ -1,0 +1,3 @@
+(library
+ (name id_model)
+ (public_name packed-id.model))

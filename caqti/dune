@@ -1,0 +1,4 @@
+(library
+ (name packed_caqti)
+ (public_name packed-caqti)
+ (libraries caqti caqti-lwt caqti-lwt.unix lwt packed_error))

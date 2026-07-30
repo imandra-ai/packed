@@ -1,0 +1,7 @@
+; Deliberately not attached to a (package ...): the test spans all three
+; packages, so attaching it to one would break `dune build -p <pkg>`
+; isolation. It runs in the workspace-wide @runtest (see CI).
+
+(test
+ (name packed_tests)
+ (libraries caqti id_factory_factory id_model packed_caqti packed_error))

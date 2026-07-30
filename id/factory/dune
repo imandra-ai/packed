@@ -1,0 +1,4 @@
+(library
+ (name id_factory_factory)
+ (public_name packed-id.factory)
+ (libraries id_model))

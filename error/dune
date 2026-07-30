@@ -1,0 +1,3 @@
+(library
+ (name packed_error)
+ (public_name packed-error))

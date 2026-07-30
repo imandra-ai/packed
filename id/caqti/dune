@@ -1,0 +1,9 @@
+; Unwrapped so the module names match their original imandra-web
+; spellings -- migrating consumers swap library deps without editing
+; sources.
+
+(library
+ (name packed_id_caqti)
+ (public_name packed-id.caqti)
+ (wrapped false)
+ (libraries caqti id_factory_factory))
