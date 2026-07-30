@@ -31,6 +31,18 @@
    (>= 4.08))))
 
 (package
+ (name packed-error-factory)
+ (synopsis "Boilerplate generators for the packed-error pattern")
+ (description
+  "Functors that generate the pack/repack/of_list constructors for a packed error module, so each error type declares its shape once instead of hand-writing the first-class-module packing. Extracted from imandra-web.")
+ (depends
+  dune
+  (ocaml
+   (>= 4.08))
+  (packed-error
+   (= :version))))
+
+(package
  (name packed-caqti)
  (synopsis "Db-connection capability and transaction plumbing for Caqti")
  (description

@@ -1,0 +1,4 @@
+(library
+ (name packed_error_factory)
+ (public_name packed-error-factory)
+ (libraries packed_error))
