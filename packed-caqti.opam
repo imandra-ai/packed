@@ -13,8 +13,8 @@ bug-reports: "https://github.com/imandra-ai/packed/issues"
 depends: [
   "dune" {>= "3.8"}
   "ocaml" {>= "4.08"}
-  "caqti" {>= "2.0"}
-  "caqti-lwt" {>= "2.0"}
+  "caqti" {>= "2.0" & < "2.2"}
+  "caqti-lwt" {>= "2.0" & < "2.2"}
   "lwt"
   "packed-error" {= version}
   "odoc" {with-doc}

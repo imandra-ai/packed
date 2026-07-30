@@ -51,10 +51,18 @@
   dune
   (ocaml
    (>= 4.08))
+  ; Upper bound: caqti 2.2 reorganised where Caqti_type / Caqti_error
+  ; live, so the code below no longer resolves them under the plain
+  ; [caqti] findlib package. 2.1.x is also what the whole consuming
+  ; chain (imandra-auditor, sigmax) pins, so keep it in lockstep.
   (caqti
-   (>= 2.0))
+   (and
+    (>= 2.0)
+    (< 2.2)))
   (caqti-lwt
-   (>= 2.0))
+   (and
+    (>= 2.0)
+    (< 2.2)))
   lwt
   (packed-error
    (= :version))))
@@ -68,4 +76,7 @@
   dune
   (ocaml
    (>= 4.08))
-  caqti))
+  ; See packed-caqti: the Caqti bridge uses Caqti_type, which moved in
+  ; caqti 2.2. Keep in lockstep with the rest of the chain.
+  (caqti
+   (< 2.2))))
