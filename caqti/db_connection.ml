@@ -16,6 +16,17 @@ type t =
 
 let use f pool = Caqti_lwt_unix.Pool.use f pool
 
+(* Wraps [f] in BEGIN/COMMIT. Three ways out of [f]:
+   - [Ok x]     -> COMMIT, result [Ok x]
+   - [Error e]  -> ROLLBACK, result [Error e]
+   - raise      -> ROLLBACK, then the exception is re-raised unchanged.
+   The last arm matters because [Pool.use] hands the connection back to the
+   pool whatever happens; without it a raise leaves BEGIN open on a pooled
+   connection and the next borrower's statements silently join (and commit)
+   that transaction. A failed COMMIT needs no ROLLBACK: Postgres has already
+   ended the transaction. A ROLLBACK failure on the raise path is dropped in
+   favour of the original exception; Caqti resets a connection whose call
+   failed, so it does not return to the pool mid-transaction either way. *)
 let with_db_transaction_map_error ~map_transaction_error
     (f : (module Caqti_lwt.CONNECTION) -> ('a, 'e) result Lwt.t)
     (db_pool :
@@ -29,20 +40,29 @@ let with_db_transaction_map_error ~map_transaction_error
          match start_result with
          | Error transaction_error -> Lwt.return (Error transaction_error)
          | Ok () -> (
-             let* result = f db in
-             match result with
-             | Ok x -> (
+             let* outcome =
+               Lwt.catch
+                 (fun () ->
+                   let+ result = f db in
+                   `Returned result)
+                 (fun exn -> Lwt.return (`Raised exn))
+             in
+             match outcome with
+             | `Returned (Ok x) -> (
                  let* commit_result = Db.commit () in
                  match commit_result with
                  | Ok () -> Lwt.return (Ok (Ok x))
                  | Error transaction_error ->
                      Lwt.return (Error transaction_error))
-             | Error e -> (
+             | `Returned (Error e) -> (
                  let* rollback_result = Db.rollback () in
                  match rollback_result with
                  | Ok () -> Lwt.return (Ok (Error e))
                  | Error transaction_error ->
-                     Lwt.return (Error transaction_error))))
+                     Lwt.return (Error transaction_error))
+             | `Raised exn ->
+                 let* (_ : (unit, Caqti_error.t) result) = Db.rollback () in
+                 Lwt.reraise exn))
   |> Lwt.map (function
        | Ok result -> result
        | Error transaction_error ->
